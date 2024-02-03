@@ -179,3 +179,51 @@ def api_for_stadium_owner_update(request, pk):
         
 
 
+
+from datetime import datetime
+from django.utils import timezone
+
+@api_view(['GET', 'POST', 'PUT'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def api_for_stadum_brone_filter(request, pk=None):
+    user = request.user
+
+    if user.is_authenticated:
+        if user.role == 'regular_user':
+            if request.method == 'GET':
+                # Agar GET so'rovi kelsa, faqat o'zining maydonlarini olish
+                date_param = request.query_params.get('date', None)
+                print(date_param)
+                if date_param:
+                    # Agar "date" qiymati kiritilgan bo'lsa, uni o'zgartirish uchun ishlatamiz
+                    try:
+                        date = datetime.strptime(date_param, '%Y-%m-%d').date()
+                        fields = FootballField.objects.filter(bron=False, date=date)
+                    except ValueError:
+                        return Response({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    # "date" qiymati kiritilmagan bo'lsa, umumiy ma'lumotlarni olib kelamiz
+                    fields = FootballField.objects.filter(bron=False)
+
+                serializer = FootballFieldSerializer(fields, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            elif request.method == 'PUT' and pk is not None:
+                # Agar PUT so'rovi kelsa, ma'lum bir maydonni yangilash
+                try:
+                    field = FootballField.objects.get(id=pk)
+                    serializer = FootballFieldBronSerializer(field, data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return Response(serializer.data, status=status.HTTP_200_OK)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                except FootballField.DoesNotExist:
+                    return Response({'error': 'Field not found or you are not the owner'}, status=status.HTTP_404_NOT_FOUND)
+
+            else:
+                return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else:
+            return Response({'error': 'You are not the owner'}, status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response({'error': 'You are not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
