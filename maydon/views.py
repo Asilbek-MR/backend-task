@@ -8,9 +8,7 @@ from .serializers import FootballFieldUserSerializer,FootballFieldSerializer,Pro
 from .models import ProfileUser,FootballField
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.generics import (CreateAPIView, DestroyAPIView, 
-                                ListAPIView,ListCreateAPIView,RetrieveUpdateAPIView,
-                                RetrieveUpdateDestroyAPIView)
+
 
 
 @api_view(['POST'])
@@ -194,7 +192,6 @@ def api_for_stadum_brone_filter(request, pk=None):
             if request.method == 'GET':
                 # Agar GET so'rovi kelsa, faqat o'zining maydonlarini olish
                 date_param = request.query_params.get('date', None)
-                print(date_param)
                 if date_param:
                     # Agar "date" qiymati kiritilgan bo'lsa, uni o'zgartirish uchun ishlatamiz
                     try:

@@ -1,5 +1,4 @@
 from django.urls import path
-from django.urls import path, include
 
 from .views import (register_user,api_for_stadium_owner_update,
                     api_view_field,api_for_admin,api_for_stadum_owner,
