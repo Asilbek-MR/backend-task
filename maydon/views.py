@@ -271,3 +271,10 @@ def api_for_stadum_brone_filter(request, pk=None):
         return Response(
             {"error": "You are not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
         )
+
+#41.27960194617251, 69.21253518475135
+
+# 41.32210727274154, 69.23209677220309
+
+#40.84497848619382, 69.60015893050563
+
